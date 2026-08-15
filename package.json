@@ -1,0 +1,26 @@
+{
+  "name": "pi-telegram-multiacc",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Multi-account and multi-bot Telegram DM bridge extension for pi",
+  "type": "module",
+  "keywords": ["pi-package", "pi", "telegram", "bot", "extension"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/musichen/pi-telegram-multiacc.git"
+  },
+  "homepage": "https://github.com/musichen/pi-telegram-multiacc",
+  "bugs": {
+    "url": "https://github.com/musichen/pi-telegram-multiacc/issues"
+  },
+  "pi": {
+    "extensions": ["./index.ts"]
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-ai": "*",
+    "@mariozechner/pi-agent-core": "*",
+    "@mariozechner/pi-coding-agent": "*",
+    "@sinclair/typebox": "*"
+  }
+}
