@@ -1,174 +1,182 @@
 # pi-telegram-multiacc
 
-![pi-telegram screenshot](screenshot.png)
+A Telegram DM bridge for [pi](https://pi.dev) with support for multiple authorized Telegram accounts and a separate bot for each pi session.
 
-Multi-account and multi-bot Telegram DM bridge for pi.
+Use it when you want, for example:
 
-This independent extension is based on [badlogic/pi-telegram](https://github.com/badlogic/pi-telegram) and adds multiple Telegram account allowlisting plus separate bot configurations for separate pi sessions.
+- one bot for a work pi session and another for personal work
+- two pi sessions running at once, each controlled through a different bot
+- multiple trusted Telegram accounts that can message the same bot
+
+This independent extension is based on [badlogic/pi-telegram](https://github.com/badlogic/pi-telegram).
 
 ## Install
 
-From git:
+Install globally for your user:
 
 ```bash
 pi install git:github.com/musichen/pi-telegram-multiacc
 ```
 
-Or for a single run:
+Install only for the current project:
+
+```bash
+pi install -l git:github.com/musichen/pi-telegram-multiacc
+```
+
+Try it for one pi run without installing it:
 
 ```bash
 pi -e git:github.com/musichen/pi-telegram-multiacc
 ```
 
-## Configure
-
-### Telegram
-
-1. Open [@BotFather](https://t.me/BotFather)
-2. Run `/newbot`
-3. Pick a name and username
-4. Copy the bot token
-
-### pi
-
-Start pi, then run:
+Update installed pi packages later with:
 
 ```bash
+pi update --extensions
+```
+
+> Extensions run with your full system permissions. Review the source before installing it.
+
+## Create Telegram bots
+
+1. Open [@BotFather](https://t.me/BotFather).
+2. Run `/newbot` once for each bot you want to use.
+3. Choose each bot's name and username.
+4. Copy each bot token.
+
+## First bot
+
+Start pi and configure the first bot:
+
+```text
 /telegram-setup
 ```
 
-Paste the bot token when prompted.
-
-The extension stores config in:
+Paste the token when prompted, then connect it:
 
 ```text
-~/.pi/agent/telegram.json
+/telegram-connect
 ```
 
-### Add and select multiple bots
+From Telegram, open that bot's DM and send `/start`. The first account to do this is authorized automatically.
 
-Run this command once for each additional bot:
+## Add another bot
 
-```bash
+For every additional bot, run this in any pi session:
+
+```text
 /telegram-add
 ```
 
-Paste the bot token when prompted. The extension calls Telegram's `getMe` API to
-retrieve the bot username, then stores the configuration automatically as:
+Paste the new bot's token. The extension asks Telegram's official `getMe` API for the bot username and creates a configuration automatically:
 
 ```text
 ~/.pi/agent/telegram-<bot-username>.json
 ```
 
-Existing `telegram.json` configurations are renamed automatically on the next
-start after the extension is updated, using their saved bot username.
+For example, two configured bots create:
 
-Run `/telegram-connect` to select a bot for the current pi session. The menu
-labels each choice with its bot username and configuration filename.
-
-For scripts or a fixed session assignment, `PI_TELEGRAM_CONFIG` bypasses the menu:
-
-```bash
-PI_TELEGRAM_CONFIG="$HOME/.pi/agent/telegram-coding_bot.json" pi
+```text
+~/.pi/agent/telegram-codyagent1_bot.json
+~/.pi/agent/telegram-codyagent2_bot.json
 ```
 
-Each configuration has its own bot token, allowlist, and update offset.
+The existing legacy `telegram.json` file is renamed automatically on startup once its saved bot username is available.
 
-## Connect a pi session
+## Connect two pi sessions to two bots
 
-The Telegram bridge is session-local. Connect it only in the pi session that should own the bot:
+Open two terminals and start pi in each.
+
+### Terminal 1
 
 ```bash
+pi
+```
+
+```text
+/telegram-connect
+
+? Connect Telegram bot
+❯ @codyagent1_bot (telegram-codyagent1_bot.json)
+  @codyagent2_bot (telegram-codyagent2_bot.json)
+```
+
+Select `@codyagent1_bot`.
+
+### Terminal 2
+
+```bash
+pi
+```
+
+```text
+/telegram-connect
+
+? Connect Telegram bot
+  @codyagent1_bot (telegram-codyagent1_bot.json)
+❯ @codyagent2_bot (telegram-codyagent2_bot.json)
+```
+
+Select `@codyagent2_bot`, then DM it in Telegram and send `/start` from the account that should control it.
+
+Each bot must be connected to only one pi session at a time. Telegram's polling API is not designed for two sessions to poll the same bot concurrently.
+
+Check a session's assignment with:
+
+```text
+/telegram-status
+
+bot: @codyagent2_bot | config: telegram-codyagent2_bot.json | allowed users: 123456789 | polling: running
+```
+
+## Allow multiple Telegram accounts for one bot
+
+Each bot config has an allowlist. Add every trusted Telegram numeric user ID to `allowedUserIds`:
+
+```json
+{
+  "allowedUserIds": [123456789, 987654321]
+}
+```
+
+Keep the existing `botToken`, `botId`, `botUsername`, and `lastUpdateId` fields in that config file. Existing configurations using the original single-user form remain supported and are migrated automatically:
+
+```json
+{
+  "allowedUserId": 123456789
+}
+```
+
+After editing the allowlist, reconnect the bot:
+
+```text
+/telegram-disconnect
 /telegram-connect
 ```
 
-To stop polling in the current session:
+Use numeric Telegram user IDs, not usernames. Usernames can change. You can obtain an account ID from a bot such as [@userinfobot](https://t.me/userinfobot).
+
+## Fixed bot assignment for scripts
+
+Normally `/telegram-connect` displays a menu when multiple configured bots exist. For a script or fixed assignment, start pi with a specific configuration:
 
 ```bash
-/telegram-disconnect
+PI_TELEGRAM_CONFIG="$HOME/.pi/agent/telegram-codyagent1_bot.json" pi
 ```
 
-Check status:
+That pi process always uses `@codyagent1_bot` and bypasses the selection menu.
 
-```bash
-/telegram-status
-```
-
-## Pair Telegram accounts
-
-After token setup and `/telegram-connect`:
-
-1. Open the DM with your bot in Telegram
-2. Send `/start` from the first account
-3. Add additional numeric Telegram user IDs to `~/.pi/agent/telegram.json`:
-
-```json
-"allowedUserIds": [530236679, 123456789]
-```
-
-The extension accepts messages from every listed account. Existing configs using
-`allowedUserId` are migrated automatically when the bridge reconnects.
-
-## Usage
-
-Chat with your bot in Telegram DMs.
-
-### Send text
-
-Send any message in the bot DM. It is forwarded into pi with a `[telegram]` prefix.
-
-### Send images and files
-
-Send images, albums, or files in the DM.
-
-The extension:
-- downloads them to `~/.pi/agent/tmp/telegram`
-- includes local file paths in the prompt
-- forwards inbound images as image inputs to pi
-
-### Ask for files back
-
-If you ask pi for a file or generated artifact, pi should call the `telegram_attach` tool. The extension then sends those files with the next Telegram reply.
-
-Examples:
-- `summarize this image`
-- `read this README and summarize it`
-- `write me a markdown file with the plan and send it back`
-- `generate a shell script and attach it`
-
-### Stop a run
-
-In Telegram, send:
+## Commands
 
 ```text
-stop
+/telegram-setup       Configure the current bot
+/telegram-add         Add another bot from its token
+/telegram-connect     Select and connect a configured bot
+/telegram-disconnect  Stop polling in the current pi session
+/telegram-status      Show the assigned bot, config, and connection state
 ```
 
-or:
+## License and attribution
 
-```text
-/stop
-```
-
-That aborts the active pi turn.
-
-### Queue follow-ups
-
-If you send more Telegram messages while pi is busy, they are queued and processed in order.
-
-## Streaming
-
-The extension streams assistant text previews back to Telegram while pi is generating.
-
-It tries Telegram draft streaming first with `sendMessageDraft`. If that is not supported for your bot, it falls back to `sendMessage` plus `editMessageText`.
-
-## Notes
-
-- Only one pi session should be connected to the bot at a time
-- Replies are sent as normal Telegram messages, not quote-replies
-- Long replies are split below Telegram's 4096 character limit
-- Outbound files are sent via `telegram_attach`
-
-## License
-
-MIT
+This project is released under the MIT License. It is derived from [pi-telegram](https://github.com/badlogic/pi-telegram) by Mario Zechner and retains its license and attribution.
