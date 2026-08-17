@@ -2,7 +2,7 @@
   "name": "pi-telegram-multi",
   "version": "0.1.0",
   "private": false,
-  "description": "Multi-account and multi-bot Telegram DM bridge extension for pi",
+  "description": "Multi-account and multi-bot Telegram DM bridge for pi: allowlist multiple Telegram users and assign a separate bot to each pi session to drive multiple coding-agent sessions in parallel.",
   "type": "module",
   "keywords": ["pi-package", "pi", "telegram", "bot", "extension"],
   "license": "MIT",

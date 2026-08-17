@@ -1,6 +1,12 @@
 # pi-telegram-multi
 
-A Telegram DM bridge for [pi](https://pi.dev) with support for multiple authorized Telegram accounts and a separate bot for each pi session.
+A Telegram DM bridge for [pi](https://pi.dev) that supports multiple authorized Telegram accounts and multiple bots - one bot assigned per pi session.
+
+With it you can drive several coding-agent sessions in parallel from Telegram:
+
+- **Multi-account**: allowlist multiple Telegram users so several accounts can message the same bot.
+- **Multi-bot**: register multiple bots and assign a separate bot to each pi session, so each session is controlled through its own bot.
+- **Multi-session**: run several pi sessions at once, each owned by a different bot and managed independently.
 
 Use it when you want, for example:
 
