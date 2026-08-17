@@ -1,5 +1,5 @@
 {
-  "name": "pi-telegram-multiacc",
+  "name": "pi-telegram-multi",
   "version": "0.1.0",
   "private": false,
   "description": "Multi-account and multi-bot Telegram DM bridge extension for pi",
@@ -8,11 +8,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/musichen/pi-telegram-multiacc.git"
+    "url": "https://github.com/musichen/pi-telegram-multi.git"
   },
-  "homepage": "https://github.com/musichen/pi-telegram-multiacc",
+  "homepage": "https://github.com/musichen/pi-telegram-multi",
   "bugs": {
-    "url": "https://github.com/musichen/pi-telegram-multiacc/issues"
+    "url": "https://github.com/musichen/pi-telegram-multi/issues"
   },
   "pi": {
     "extensions": ["./index.ts"]

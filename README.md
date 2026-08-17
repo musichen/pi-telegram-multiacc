@@ -1,4 +1,4 @@
-# pi-telegram-multiacc
+# pi-telegram-multi
 
 A Telegram DM bridge for [pi](https://pi.dev) with support for multiple authorized Telegram accounts and a separate bot for each pi session.
 
@@ -15,19 +15,19 @@ This independent extension is based on [badlogic/pi-telegram](https://github.com
 Install globally for your user:
 
 ```bash
-pi install git:github.com/musichen/pi-telegram-multiacc
+pi install git:github.com/musichen/pi-telegram-multi
 ```
 
 Install only for the current project:
 
 ```bash
-pi install -l git:github.com/musichen/pi-telegram-multiacc
+pi install -l git:github.com/musichen/pi-telegram-multi
 ```
 
 Try it for one pi run without installing it:
 
 ```bash
-pi -e git:github.com/musichen/pi-telegram-multiacc
+pi -e git:github.com/musichen/pi-telegram-multi
 ```
 
 Update installed pi packages later with:
